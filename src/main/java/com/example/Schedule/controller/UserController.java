@@ -46,7 +46,7 @@ public class UserController {
             @RequestParam(required = false) String email
     ) {
         List<UserResponseDto> userList = userService.findUsers(id, username, email);
-        if(userList.isEmpty()){
+        if (userList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "조건에 맞는 사용자가 없습니다.");
         }
         return new ResponseEntity<>(userList, HttpStatus.OK);
@@ -55,7 +55,7 @@ public class UserController {
     //update
     // 비밀번호 일치 시, 사용자 이름, 비밀번호, 이메일 수정 가능
     @PatchMapping("/{id}")
-    @Operation(summary = "사용자 수정", description = "비밀번호 일치시, 사용자 이름, 비밀번호, 이메일을 수정합니다.")
+    @Operation(summary = "사용자 수정", description = "비밀번호 일치 시, 사용자 이름, 비밀번호, 이메일을 수정합니다.")
     public ResponseEntity<SignUpResponseDto> updateUser(
             @PathVariable Long id,
             @RequestParam String inputPassword,
@@ -65,5 +65,29 @@ public class UserController {
     ) {
         SignUpResponseDto responseDto = userService.updateUser(id, inputPassword, newPassword, newUsername, newEmail);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    // delete -> 논리 삭제 요청
+    @DeleteMapping("/{id}")
+    @Operation(summary = "사용자 삭제", description = "비밀번호 일치 시 사용자를 삭제합니다.")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id, @RequestParam String password) {
+        userService.softDeleteUser(id, password);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 논리 삭제된 사용자 조회
+    @GetMapping("/deleted")
+    @Operation(summary = "삭제된 사용자 조회", description = "삭제된 사용자를 조회합니다.")
+    public ResponseEntity<List<UserResponseDto>> getDeletedUser() {
+        List<UserResponseDto> deletedUser = userService.getDeletedUser();
+        return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+    }
+
+    // 논리 삭제된 사용자 복구
+    @PutMapping("/restore/{id}")
+    @Operation(summary = "삭제된 사용자 복구", description = "삭제된 사용자를 복구합니다.")
+    public ResponseEntity<Void> restoreUser(@PathVariable Long id){
+        userService.restoreUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

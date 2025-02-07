@@ -6,10 +6,12 @@ import com.example.Schedule.entity.User;
 import com.example.Schedule.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -65,6 +67,48 @@ public class UserService {
         }
 
         return new SignUpResponseDto(findUser.getId(), findUser.getUsername(), findUser.getEmail());
+    }
+
+    //delete -> 논리 삭제 요청
+    @Transactional
+    public void softDeleteUser(Long id, String inputPassword) {
+        User user = userRepository.findByIdOrElseThrow(id);
+
+        // 비밀번호 검증
+        if (!user.getPassword().equals(inputPassword)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        }
+
+        user.setDeleted(true);
+        userRepository.save(user);
+    }
+
+    // delete -> 일정 시간이 지나면 물리 삭제
+    @Transactional
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void deleteUsers() {
+
+        LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
+        List<User> usersToDelete = userRepository.findAllByIsDeletedTrueAndDeletedAtBefore(twoWeeksAgo);
+
+        if (!usersToDelete.isEmpty()) {
+            userRepository.deleteAll(usersToDelete);
+        }
+    }
+
+    // 물리 삭제된 사용자 조회 --> 수정하기
+    public List<UserResponseDto> getDeletedUser() {
+        return userRepository.findAllByIsDeletedTrue().stream()
+                .map(UserResponseDto::toDto)
+                .toList();
+    }
+
+    // 물리 삭제된 사용자 복구 --> 수정하기
+    public void restoreUser(Long id) {
+        User user = userRepository.findByIdOrElseThrow(id);
+        user.setDeleted(false);
+        user.setDeletedAt(null);
+        userRepository.save(user);
     }
 
 }

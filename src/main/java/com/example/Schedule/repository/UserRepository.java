@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -31,4 +32,10 @@ public interface UserRepository extends JpaRepository<User,Long> {
         return findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
     }
 
+    // Delete
+    // 삭제 요청 후 2주가 지난 사용자만 삭제
+    List<User> findAllByIsDeletedTrueAndDeletedAtBefore(LocalDateTime dateTime);
+
+    // 삭제 요청된 사용자 조회
+    List<User> findAllByIsDeletedTrue();
 }
