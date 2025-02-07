@@ -14,4 +14,5 @@ public class SignUpResponseDto {
         this.username = username;
         this.email = email;
     }
+
 }

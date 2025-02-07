@@ -4,14 +4,17 @@ import com.example.Schedule.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
 
-    // 조회
+    // Read
+    // 아이디, 이름, 이메일로 조회
     @Query ("SELECT u From User u WHERE " +
             "(:id IS NULL OR u.id = :id) AND " +
             "(:username IS NULL OR u.username = :username) AND " +
@@ -21,4 +24,11 @@ public interface UserRepository extends JpaRepository<User,Long> {
             @Param("username") String username,
             @Param("email") String email
     );
+
+    // Read
+    // 단일 아이디 조회
+    default User findByIdOrElseThrow (Long id){
+        return findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
+    }
+
 }
