@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface UserRepository extends JpaRepository<User,Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     // Read
     // 아이디, 이름, 이메일로 조회
-    @Query ("SELECT u From User u WHERE " +
+    @Query("SELECT u From User u WHERE " +
             "(:id IS NULL OR u.id = :id) AND " +
             "(:username IS NULL OR u.username = :username) AND " +
             "(:email IS NULL OR u.email = :email)")
-    List<User> findUsers (
+    List<User> findUsers(
             @Param("id") Long id,
             @Param("username") String username,
             @Param("email") String email
@@ -28,8 +28,8 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     // Read
     // 단일 아이디 조회
-    default User findByIdOrElseThrow (Long id){
-        return findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
+    default User findByIdOrElseThrow(Long id) {
+        return findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
     }
 
     // Delete
@@ -37,5 +37,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
     List<User> findAllByIsDeletedTrueAndDeletedAtBefore(LocalDateTime dateTime);
 
     // 삭제 요청된 사용자 조회
+    @Query(value = "SELECT * FROM user WHERE is_deleted = true", nativeQuery = true)
     List<User> findAllByIsDeletedTrue();
+
 }

@@ -1,6 +1,5 @@
 package com.example.Schedule.service;
 
-import com.example.Schedule.dto.SignUpResponseDto;
 import com.example.Schedule.dto.UserResponseDto;
 import com.example.Schedule.entity.User;
 import com.example.Schedule.repository.UserRepository;
@@ -13,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +21,10 @@ public class UserService {
     private final UserRepository userRepository;
 
     // Create -> 사용자 정보 생성
-    public SignUpResponseDto signUp(String username, String password, String email) {
+    public UserResponseDto signUp(String username, String password, String email) {
         User user = new User(username, password, email);
         User savedUser = userRepository.save(user);
-        return new SignUpResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
+        return new UserResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
     }
 
     // Read
@@ -42,7 +42,7 @@ public class UserService {
     //update
     // 비밀번호 일치 시, 비밀번호, 사용자 이름, 이메일 수정 가능
     @Transactional
-    public SignUpResponseDto updateUser(Long id, String inputPassword, String newPassword, String newUsername, String newEmail) {
+    public UserResponseDto updateUser(Long id, String inputPassword, String newPassword, String newUsername, String newEmail) {
 
         User findUser = userRepository.findByIdOrElseThrow(id);
 
@@ -66,7 +66,7 @@ public class UserService {
             findUser.setEmail(newEmail);
         }
 
-        return new SignUpResponseDto(findUser.getId(), findUser.getUsername(), findUser.getEmail());
+        return new UserResponseDto(findUser.getId(), findUser.getUsername(), findUser.getEmail());
     }
 
     //delete -> 논리 삭제 요청
@@ -79,7 +79,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
         }
 
-        user.setDeleted(true);
+        user.setIsDeleted(true);
         userRepository.save(user);
     }
 
@@ -96,8 +96,8 @@ public class UserService {
         }
     }
 
-    // 물리 삭제된 사용자 조회 --> 수정하기
-    public List<UserResponseDto> getDeletedUser() {
+    // 물리 삭제된 사용자 조회
+    public List<UserResponseDto> getDeletedUsers() {
         return userRepository.findAllByIsDeletedTrue().stream()
                 .map(UserResponseDto::toDto)
                 .toList();
@@ -105,10 +105,24 @@ public class UserService {
 
     // 물리 삭제된 사용자 복구 --> 수정하기
     public void restoreUser(Long id) {
-        User user = userRepository.findByIdOrElseThrow(id);
-        user.setDeleted(false);
+        Optional<User> restoreUser = userRepository.findAllByIsDeletedTrue().stream()
+                .filter(user -> user.getId().equals(id))
+                .findFirst();
+
+        User user =restoreUser.orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id = " + id));
+
+        user.setIsDeleted(false);
         user.setDeletedAt(null);
         userRepository.save(user);
     }
+
+//    // 물리 삭제된 사용자 복구 --> 수정하기
+//    public void restoreUser2(Long id) {
+//        User user = userRepository.findByIdOrElseThrow(id);
+//        user.setIsDeleted(false);
+//        user.setDeletedAt(null);
+//        userRepository.save(user);
+//    }
 
 }

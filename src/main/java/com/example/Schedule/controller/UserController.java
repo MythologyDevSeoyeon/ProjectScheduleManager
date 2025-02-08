@@ -1,8 +1,6 @@
 package com.example.Schedule.controller;
 
-
-import com.example.Schedule.dto.SignUpRequestDto;
-import com.example.Schedule.dto.SignUpResponseDto;
+import com.example.Schedule.dto.UserRequestDto;
 import com.example.Schedule.dto.UserResponseDto;
 import com.example.Schedule.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +24,8 @@ public class UserController {
     // Create -> 사용자 정보 생성
     @Operation(summary = "사용자 생성", description = "사용자를 생성합니다.")
     @PostMapping
-    public ResponseEntity<SignUpResponseDto> signUp(@RequestBody SignUpRequestDto requestDto) {
-        SignUpResponseDto signUpResponseDto =
+    public ResponseEntity<UserResponseDto> signUp(@RequestBody UserRequestDto requestDto) {
+        UserResponseDto signUpResponseDto =
                 userService.signUp(
                         requestDto.getUsername(),
                         requestDto.getPassword(),
@@ -35,6 +33,7 @@ public class UserController {
                 );
         return new ResponseEntity<>(signUpResponseDto, HttpStatus.CREATED);
     }
+
 
     // Read
     // 아이디, 이름, 이메일로 조회
@@ -56,14 +55,14 @@ public class UserController {
     // 비밀번호 일치 시, 사용자 이름, 비밀번호, 이메일 수정 가능
     @PatchMapping("/{id}")
     @Operation(summary = "사용자 수정", description = "비밀번호 일치 시, 사용자 이름, 비밀번호, 이메일을 수정합니다.")
-    public ResponseEntity<SignUpResponseDto> updateUser(
+    public ResponseEntity<UserResponseDto> updateUser(
             @PathVariable Long id,
             @RequestParam String inputPassword,
             @RequestParam(required = false) String newPassword,
             @RequestParam(required = false) String newUsername,
             @RequestParam(required = false) String newEmail
     ) {
-        SignUpResponseDto responseDto = userService.updateUser(id, inputPassword, newPassword, newUsername, newEmail);
+        UserResponseDto responseDto = userService.updateUser(id, inputPassword, newPassword, newUsername, newEmail);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
@@ -79,8 +78,8 @@ public class UserController {
     @GetMapping("/deleted")
     @Operation(summary = "삭제된 사용자 조회", description = "삭제된 사용자를 조회합니다.")
     public ResponseEntity<List<UserResponseDto>> getDeletedUser() {
-        List<UserResponseDto> deletedUser = userService.getDeletedUser();
-        return new ResponseEntity<>(deletedUser, HttpStatus.OK);
+        List<UserResponseDto> deletedUsers = userService.getDeletedUsers();
+        return new ResponseEntity<>(deletedUsers, HttpStatus.OK);
     }
 
     // 논리 삭제된 사용자 복구
