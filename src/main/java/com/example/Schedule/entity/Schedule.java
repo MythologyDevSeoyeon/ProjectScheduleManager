@@ -1,8 +1,10 @@
 package com.example.Schedule.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class Schedule extends BaseEntity {
 
     @Id
@@ -19,4 +21,16 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false)
+    private String password;
+
+    public Schedule( User user, String password, String title, String contents) {
+        this.title = title;
+        this.contents = contents;
+        this.user = user;
+        this.password = password;
+    }
+
+    public Schedule() {
+    }
 }

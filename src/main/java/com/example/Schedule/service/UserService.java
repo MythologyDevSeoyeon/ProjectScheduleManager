@@ -20,6 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+
     // Create -> 사용자 정보 생성
     public UserResponseDto signUp(String username, String password, String email) {
         User user = new User(username, password, email);
@@ -30,14 +31,15 @@ public class UserService {
     // Read
     // 아이디, 이름, 이메일로 조회
     public List<UserResponseDto> findUsers(Long id, String username, String email) {
-        return userRepository.findUsers(id,
-                        (username != null && !username.trim().isEmpty() ? username : null),
-                        (email != null && !email.trim().isEmpty() ? email : null))
-                .stream()
-                .map(UserResponseDto::toDto)
-                .toList();
+        List<User> userList = userRepository.findUsers(id,
+                sanitizeString(username),
+                sanitizeString(email)
+        );
+        if(userList.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return userList.stream().map(UserResponseDto::toDto).toList();
     }
-
 
     //update
     // 비밀번호 일치 시, 비밀번호, 사용자 이름, 이메일 수정 가능
@@ -96,20 +98,21 @@ public class UserService {
         }
     }
 
-    // 물리 삭제된 사용자 조회
+    // 논리 삭제된 사용자 조회
     public List<UserResponseDto> getDeletedUsers() {
         return userRepository.findAllByIsDeletedTrue().stream()
                 .map(UserResponseDto::toDto)
                 .toList();
     }
 
-    // 물리 삭제된 사용자 복구 --> 수정하기
+    // 논리 삭제된 사용자 복구 --> 수정하기
+    @Transactional
     public void restoreUser(Long id) {
         Optional<User> restoreUser = userRepository.findAllByIsDeletedTrue().stream()
                 .filter(user -> user.getId().equals(id))
                 .findFirst();
 
-        User user =restoreUser.orElseThrow(() ->
+        User user = restoreUser.orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id = " + id));
 
         user.setIsDeleted(false);
@@ -117,12 +120,9 @@ public class UserService {
         userRepository.save(user);
     }
 
-//    // 물리 삭제된 사용자 복구 --> 수정하기
-//    public void restoreUser2(Long id) {
-//        User user = userRepository.findByIdOrElseThrow(id);
-//        user.setIsDeleted(false);
-//        user.setDeletedAt(null);
-//        userRepository.save(user);
-//    }
+    // 공백 제거 및 빈 문자열을 null로 변환하는 헬퍼 메서드
+    private String sanitizeString(String input) {
+        return (input != null && !input.trim().isEmpty()) ? input : null;
+    }
 
 }

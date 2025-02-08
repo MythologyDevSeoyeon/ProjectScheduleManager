@@ -9,28 +9,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@Tag(name = "일정 관리 API", description = "일정과 사용자를 생성하고 조회하는 API입니다.")
+@Tag(name = "사용자 관리 API", description = "사용자를 생성하고 조회하는 API입니다.")
 public class UserController {
 
     private final UserService userService;
 
     // Create -> 사용자 정보 생성
-    @Operation(summary = "사용자 생성", description = "사용자를 생성합니다.")
     @PostMapping
+    @Operation(summary = "사용자 생성", description = "사용자를 생성합니다.")
     public ResponseEntity<UserResponseDto> signUp(@RequestBody UserRequestDto requestDto) {
-        UserResponseDto signUpResponseDto =
-                userService.signUp(
-                        requestDto.getUsername(),
-                        requestDto.getPassword(),
-                        requestDto.getEmail()
-                );
+        UserResponseDto signUpResponseDto = userService.signUp(
+                requestDto.getUsername(),
+                requestDto.getPassword(),
+                requestDto.getEmail()
+        );
         return new ResponseEntity<>(signUpResponseDto, HttpStatus.CREATED);
     }
 
@@ -45,9 +43,6 @@ public class UserController {
             @RequestParam(required = false) String email
     ) {
         List<UserResponseDto> userList = userService.findUsers(id, username, email);
-        if (userList.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "조건에 맞는 사용자가 없습니다.");
-        }
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
@@ -85,7 +80,7 @@ public class UserController {
     // 논리 삭제된 사용자 복구
     @PutMapping("/restore/{id}")
     @Operation(summary = "삭제된 사용자 복구", description = "삭제된 사용자를 복구합니다.")
-    public ResponseEntity<Void> restoreUser(@PathVariable Long id){
+    public ResponseEntity<Void> restoreUser(@PathVariable Long id) {
         userService.restoreUser(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
