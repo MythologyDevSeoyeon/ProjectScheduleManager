@@ -51,4 +51,16 @@ public class ScheduleController {
         return new ResponseEntity<>(schedules, HttpStatus.OK);
     }
 
+    @PatchMapping("/{id}")
+    @Operation(summary = "일정 수정", description = "비밀번호 일치 시 제목, 내용, 비밀번호 수정")
+    public ResponseEntity<ScheduleResponseDto> updatedSchedule(
+            @PathVariable Long id,
+            @RequestParam String inputPassword,
+            @RequestBody ScheduleRequestDto requestDto
+    ){
+        ScheduleResponseDto scheduleResponseDto = scheduleService.updateSchedule(
+                id, inputPassword, requestDto);
+        return new ResponseEntity<>(scheduleResponseDto, HttpStatus.OK);
+    }
+
 }
