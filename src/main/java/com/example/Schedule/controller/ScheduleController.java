@@ -7,6 +7,8 @@ import com.example.Schedule.repository.UserRepository;
 import com.example.Schedule.service.ScheduleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +29,13 @@ public class ScheduleController {
     @Operation(summary = "일정 생성", description = "일정을 생성합니다.")
     public ResponseEntity<ScheduleResponseDto> createSchedule(
             @RequestBody ScheduleRequestDto requestDto,
-            @RequestParam Long userId
+            HttpServletRequest request
     ) {
+        HttpSession session = request.getSession(false);
+        if(session == null || session.getAttribute("userId") == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = (Long)session.getAttribute("userId");
         User user = userRepository.findByIdOrElseThrow(userId);
         ScheduleResponseDto schedule = scheduleService.createSchedule(
                 user,
