@@ -20,9 +20,15 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-
     // Create -> 사용자 정보 생성
     public UserResponseDto signUp(String username, String password, String email) {
+        try {
+            userRepository.findByEmailOrElseThrow(email);  // 이메일이 존재하면 예외 발생
+            throw new IllegalArgumentException("Email is already registered");
+        } catch (ResponseStatusException e) {
+            // 이메일이 없으면 정상적으로 회원가입 진행
+        }
+
         User user = new User(username, password, email);
         User savedUser = userRepository.save(user);
         return new UserResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
@@ -35,7 +41,7 @@ public class UserService {
                 sanitizeString(username),
                 sanitizeString(email)
         );
-        if(userList.isEmpty()){
+        if (userList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return userList.stream().map(UserResponseDto::toDto).toList();

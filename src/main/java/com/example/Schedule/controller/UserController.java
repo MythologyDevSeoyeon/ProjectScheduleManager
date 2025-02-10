@@ -21,7 +21,7 @@ public class UserController {
     private final UserService userService;
 
     // Create -> 사용자 정보 생성
-    @PostMapping
+    @PostMapping("/signup")
     @Operation(summary = "사용자 생성", description = "사용자를 생성합니다.")
     public ResponseEntity<UserResponseDto> signUp(@RequestBody UserRequestDto requestDto) {
         UserResponseDto signUpResponseDto = userService.signUp(

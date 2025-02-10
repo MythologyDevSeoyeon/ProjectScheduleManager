@@ -10,9 +10,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
 
     // Read
     // 아이디, 이름, 이메일로 조회
@@ -30,6 +32,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 단일 아이디 조회
     default User findByIdOrElseThrow(Long id) {
         return findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
+    }
+
+    // Read
+    // 이메일로 조회
+    Optional<User> findByEmail(String email);
+    default User findByEmailOrElseThrow(String email) {
+        return findByEmail(email).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist email = " + email));
     }
 
     // Delete
