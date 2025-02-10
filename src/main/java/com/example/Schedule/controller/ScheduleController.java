@@ -32,10 +32,10 @@ public class ScheduleController {
             HttpServletRequest request
     ) {
         HttpSession session = request.getSession(false);
-        if(session == null || session.getAttribute("userId") == null){
+        if (session == null || session.getAttribute("userId") == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Long userId = (Long)session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         User user = userRepository.findByIdOrElseThrow(userId);
         ScheduleResponseDto schedule = scheduleService.createSchedule(
                 user,
@@ -59,14 +59,20 @@ public class ScheduleController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "일정 수정", description = "비밀번호 일치 시 제목, 내용, 비밀번호 수정")
+    @Operation(summary = "일정 수정", description = "로그인한 사용자의 이름. 비밀번호, 이메일을 수정합니다.")
     public ResponseEntity<ScheduleResponseDto> updatedSchedule(
             @PathVariable Long id,
             @RequestParam String inputPassword,
-            @RequestBody ScheduleRequestDto requestDto
-    ){
+            @RequestBody ScheduleRequestDto requestDto,
+            HttpServletRequest request
+    ) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long currentUserId = (Long) session.getAttribute("userId");
         ScheduleResponseDto scheduleResponseDto = scheduleService.updateSchedule(
-                id, inputPassword, requestDto);
+                id, inputPassword, requestDto, currentUserId);
         return new ResponseEntity<>(scheduleResponseDto, HttpStatus.OK);
     }
 
@@ -74,9 +80,15 @@ public class ScheduleController {
     @Operation(summary = "일정 삭제", description = "비밀번호 일치 시 일정 삭제")
     public ResponseEntity<Void> deleteSchedule(
             @PathVariable Long id,
-            @RequestParam String password
+            @RequestParam String password,
+            HttpServletRequest request
     ){
-        scheduleService.deleteSchedule(id,password);
+        HttpSession session = request.getSession(false);
+        if(session == null || session.getAttribute("userId") == null){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long currentUserID = (Long) session.getAttribute("userId");
+        scheduleService.deleteSchedule(id, password, currentUserID);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

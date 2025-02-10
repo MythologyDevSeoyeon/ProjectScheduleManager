@@ -47,13 +47,13 @@ public class ScheduleService {
     // Updated -> 일정 수정
     // 비밀번호가 동일하다면, 비밀번호, 제목, 내용 수정 가능
     @Transactional
-    public ScheduleResponseDto updateSchedule(Long id, String inputPassword, ScheduleRequestDto requestDto) {
+    public ScheduleResponseDto updateSchedule(Long id, String inputPassword, ScheduleRequestDto requestDto, Long currentUserId) {
+
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
 
-        // 비밀번호 검증
-        if(!inputPassword.equals(findSchedule.getPassword())){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
-        }
+        // 검증
+        verifyPassword(findSchedule,inputPassword);
+        verifyScheduleOwnership(findSchedule,currentUserId);
 
         if(sanitizeString(requestDto.getPassword()) != null){
             findSchedule.setPassword(requestDto.getPassword());
@@ -70,21 +70,37 @@ public class ScheduleService {
         return ScheduleResponseDto.toDto(findSchedule);
     }
 
-   // delete -> 일정 삭제
+    // delete -> 일정 삭제
     @Transactional
-    public void deleteSchedule(Long id, String password) {
+    public void deleteSchedule(Long id, String inputPassword, Long currentUserId) {
+
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
 
-        if(!password.equals(findSchedule.getPassword())){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
+        verifyPassword(findSchedule,inputPassword);
+        verifyScheduleOwnership(findSchedule,currentUserId);
 
         scheduleRepository.deleteById(id);
     }
 
-    // 공백 제거 및 빈 문자열을 null로 변환하는 메서드
+    // 공백 제거 및 빈 문자열을 null로 변환하는 메소드
     private String sanitizeString(String input) {
         return (input != null && !input.trim().isEmpty()) ? input : null;
     }
+
+    // 비밀번호 검증 메소드
+    private void verifyPassword(Schedule schedule, String inputPassword) {
+        // 비밀번호 검증
+        if (!schedule.getPassword().equals(inputPassword)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    // 권한 검증 메소드
+    private void verifyScheduleOwnership(Schedule schedule, Long currentUserId){
+        if(!schedule.getUser().getId().equals(currentUserId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+    }
+
 
 }

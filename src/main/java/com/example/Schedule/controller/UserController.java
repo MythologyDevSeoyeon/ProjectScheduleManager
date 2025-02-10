@@ -5,10 +5,13 @@ import com.example.Schedule.dto.UserResponseDto;
 import com.example.Schedule.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -48,24 +51,34 @@ public class UserController {
 
     //update
     // 비밀번호 일치 시, 사용자 이름, 비밀번호, 이메일 수정 가능
-    @PatchMapping("/{id}")
-    @Operation(summary = "사용자 수정", description = "비밀번호 일치 시, 사용자 이름, 비밀번호, 이메일을 수정합니다.")
+    @PatchMapping("/my")
+    @Operation(summary = "사용자 수정", description = "로그인한 사용자의 이름, 비밀번호, 이메일을 수정합니다.")
     public ResponseEntity<UserResponseDto> updateUser(
-            @PathVariable Long id,
             @RequestParam String inputPassword,
             @RequestParam(required = false) String newPassword,
             @RequestParam(required = false) String newUsername,
-            @RequestParam(required = false) String newEmail
+            @RequestParam(required = false) String newEmail,
+            HttpServletRequest request
     ) {
-        UserResponseDto responseDto = userService.updateUser(id, inputPassword, newPassword, newUsername, newEmail);
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "권한이 없습니다.");
+        }
+        Long currentUserId = (Long) session.getAttribute("userId");
+        UserResponseDto responseDto = userService.updateUser(currentUserId, inputPassword, newPassword, newUsername, newEmail);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     // delete -> 논리 삭제 요청
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/my")
     @Operation(summary = "사용자 삭제", description = "비밀번호 일치 시 사용자를 삭제합니다.")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id, @RequestParam String password) {
-        userService.softDeleteUser(id, password);
+    public ResponseEntity<Void> deleteUser(@RequestParam String password, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "권한이 없습니다.");
+        }
+        Long currentUserId = (Long) session.getAttribute("userId");
+        userService.softDeleteUser(currentUserId, password);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -84,4 +97,5 @@ public class UserController {
         userService.restoreUser(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }
