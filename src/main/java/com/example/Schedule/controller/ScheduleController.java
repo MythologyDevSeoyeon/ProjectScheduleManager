@@ -63,4 +63,13 @@ public class ScheduleController {
         return new ResponseEntity<>(scheduleResponseDto, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "일정 삭제", description = "비밀번호 일치 시 일정 삭제")
+    public ResponseEntity<Void> deleteSchedule(
+            @PathVariable Long id,
+            @RequestParam String password
+    ){
+        scheduleService.deleteSchedule(id,password);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

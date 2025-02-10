@@ -70,8 +70,21 @@ public class ScheduleService {
         return ScheduleResponseDto.toDto(findSchedule);
     }
 
+   // delete -> 일정 삭제
+    @Transactional
+    public void deleteSchedule(Long id, String password) {
+        Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
+
+        if(!password.equals(findSchedule.getPassword())){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        scheduleRepository.deleteById(id);
+    }
+
     // 공백 제거 및 빈 문자열을 null로 변환하는 메서드
     private String sanitizeString(String input) {
         return (input != null && !input.trim().isEmpty()) ? input : null;
     }
+
 }
