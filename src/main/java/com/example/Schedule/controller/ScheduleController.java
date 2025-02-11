@@ -1,7 +1,7 @@
 package com.example.Schedule.controller;
 
-import com.example.Schedule.dto.ScheduleRequestDto;
-import com.example.Schedule.dto.ScheduleResponseDto;
+import com.example.Schedule.dto.schedule.ScheduleRequestDto;
+import com.example.Schedule.dto.schedule.ScheduleResponseDto;
 import com.example.Schedule.entity.User;
 import com.example.Schedule.repository.UserRepository;
 import com.example.Schedule.service.ScheduleService;

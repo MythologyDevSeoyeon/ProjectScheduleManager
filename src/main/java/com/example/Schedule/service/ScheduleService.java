@@ -1,8 +1,8 @@
 package com.example.Schedule.service;
 
 import com.example.Schedule.config.PasswordEncoder;
-import com.example.Schedule.dto.ScheduleRequestDto;
-import com.example.Schedule.dto.ScheduleResponseDto;
+import com.example.Schedule.dto.schedule.ScheduleRequestDto;
+import com.example.Schedule.dto.schedule.ScheduleResponseDto;
 import com.example.Schedule.entity.Schedule;
 import com.example.Schedule.entity.User;
 import com.example.Schedule.repository.ScheduleRepository;

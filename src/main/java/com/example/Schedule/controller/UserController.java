@@ -1,7 +1,7 @@
 package com.example.Schedule.controller;
 
-import com.example.Schedule.dto.UserRequestDto;
-import com.example.Schedule.dto.UserResponseDto;
+import com.example.Schedule.dto.user.UserRequestDto;
+import com.example.Schedule.dto.user.UserResponseDto;
 import com.example.Schedule.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

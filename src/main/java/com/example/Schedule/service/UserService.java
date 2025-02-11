@@ -1,7 +1,7 @@
 package com.example.Schedule.service;
 
 import com.example.Schedule.config.PasswordEncoder;
-import com.example.Schedule.dto.UserResponseDto;
+import com.example.Schedule.dto.user.UserResponseDto;
 import com.example.Schedule.entity.User;
 import com.example.Schedule.repository.UserRepository;
 import jakarta.persistence.EntityManager;

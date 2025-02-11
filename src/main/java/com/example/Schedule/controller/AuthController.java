@@ -1,6 +1,6 @@
 package com.example.Schedule.controller;
 
-import com.example.Schedule.dto.LoginRequestDto;
+import com.example.Schedule.dto.login.LoginRequestDto;
 import com.example.Schedule.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "로그인/로그아웃 API", description = "아이디와 비밀번호를 입력하여 로그인/로그아웃하는 API입니다.")
-public class LoginController {
+public class AuthController {
     private final LoginService loginService;
 
     @PostMapping("/login")
