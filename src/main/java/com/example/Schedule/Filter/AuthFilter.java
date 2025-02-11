@@ -28,7 +28,7 @@ public class AuthFilter implements Filter {
         }
 
         // 로그인 및 회원 가입 요청은 필터링 제외
-        if (requestURI.equals("/auth/login") || requestURI.equals("/user/signup")) {
+        if (requestURI.equals("/auth/login") || requestURI.equals("/users/signup")) {
             chain.doFilter(request, response);
             return;
         }

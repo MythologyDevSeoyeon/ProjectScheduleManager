@@ -35,7 +35,6 @@ public class UserController {
         return new ResponseEntity<>(signUpResponseDto, HttpStatus.CREATED);
     }
 
-
     // Read
     // 아이디, 이름, 이메일로 조회
     @GetMapping
@@ -82,20 +81,30 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // 논리 삭제된 사용자 조회
+    // 논리 삭제된 사용자 조회 -> 관리자만
     @GetMapping("/deleted")
     @Operation(summary = "삭제된 사용자 조회", description = "삭제된 사용자를 조회합니다.")
-    public ResponseEntity<List<UserResponseDto>> getDeletedUser() {
+    public ResponseEntity<List<UserResponseDto>> getDeletedUser(HttpServletRequest request) {
+        checkAdminRole(request);
         List<UserResponseDto> deletedUsers = userService.getDeletedUsers();
         return new ResponseEntity<>(deletedUsers, HttpStatus.OK);
     }
 
-    // 논리 삭제된 사용자 복구
+    // 논리 삭제된 사용자 복구 -> 관리자만
     @PutMapping("/restore/{id}")
     @Operation(summary = "삭제된 사용자 복구", description = "삭제된 사용자를 복구합니다.")
-    public ResponseEntity<Void> restoreUser(@PathVariable Long id) {
+    public ResponseEntity<Void> restoreUser(@PathVariable Long id, HttpServletRequest request) {
+        checkAdminRole(request);
         userService.restoreUser(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 관리자 권한 검증 메소드
+    private void checkAdminRole(HttpServletRequest request){
+        HttpSession session = request.getSession(false);
+        if(session == null || !"ADMIN".equals(session.getAttribute("role"))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"접근 권한이 없습니다.");
+        }
     }
 
 }

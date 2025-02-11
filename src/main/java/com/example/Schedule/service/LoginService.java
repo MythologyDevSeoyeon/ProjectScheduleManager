@@ -21,5 +21,6 @@ public class LoginService {
 
         HttpSession session = request.getSession();
         session.setAttribute("userId", user.getId());
+        session.setAttribute("role",user.getRole().toString());
     }
 }
