@@ -3,7 +3,6 @@ package com.example.Schedule.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,8 +30,6 @@ public class User extends BaseEntity {
     private String username;
 
     @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{6,12}$",
-            message = "비밀번호는 6~12자의 영문자와 숫자 조합이어야 합니다.")
     @Column(nullable = false)
     private String password;
 

@@ -1,5 +1,6 @@
 package com.example.Schedule.service;
 
+import com.example.Schedule.config.PasswordEncoder;
 import com.example.Schedule.dto.UserResponseDto;
 import com.example.Schedule.entity.User;
 import com.example.Schedule.repository.UserRepository;
@@ -22,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final EntityManager entityManager;
+    private final PasswordEncoder passwordEncoder;
 
     // Create -> 사용자 정보 생성
     public UserResponseDto signUp(String username, String password, String email) {
@@ -31,7 +33,8 @@ public class UserService {
         } catch (ResponseStatusException e) {
             // 이메일이 없으면 정상적으로 회원가입 진행
         }
-        User user = new User(username, password, email);
+        String encodedPassword = passwordEncoder.encode(password);
+        User user = new User(username, encodedPassword, email);
         User savedUser = userRepository.save(user);
         return new UserResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
     }
@@ -59,27 +62,22 @@ public class UserService {
     // 비밀번호 일치 시, 비밀번호, 사용자 이름, 이메일 수정 가능
     @Transactional
     public UserResponseDto updateUser(Long id, String inputPassword, String newPassword, String newUsername, String newEmail) {
-
         User findUser = userRepository.findByIdOrElseThrow(id);
-
-        // 비밀번호 검증
-        if (!findUser.getPassword().equals(inputPassword)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
-        }
+        validatePassword(inputPassword, findUser.getPassword());
 
         // 비밀번호 변경
         if (newPassword != null && !newPassword.trim().isEmpty()) {
-            findUser.setPassword(newPassword);
+            findUser.setPassword(passwordEncoder.encode(newPassword));
         }
 
-        // 사용자 이름
-        if (newUsername != null && !newUsername.trim().isEmpty()) {
-            findUser.setUsername(newUsername);
+        if (sanitizeString(newPassword) != null) {
+            findUser.setPassword(passwordEncoder.encode(newPassword));
         }
-
-        // 이메일 수정
-        if (newEmail != null && !newEmail.trim().isEmpty()) {
+        if (sanitizeString(newEmail) != null) {
             findUser.setEmail(newEmail);
+        }
+        if (sanitizeString(newUsername) != null) {
+            findUser.setUsername(newUsername);
         }
 
         return new UserResponseDto(findUser.getId(), findUser.getUsername(), findUser.getEmail());
@@ -89,13 +87,10 @@ public class UserService {
     @Transactional
     public void softDeleteUser(Long id, String inputPassword) {
         User user = userRepository.findByIdOrElseThrow(id);
-
-        // 비밀번호 검증
-        if (!user.getPassword().equals(inputPassword)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
-        }
-
+        validatePassword(inputPassword, user.getPassword());
+        // 논리 삭제 처리
         user.setIsDeleted(true);
+        user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
     }
 
@@ -137,6 +132,13 @@ public class UserService {
     // 공백 제거 및 빈 문자열을 null로 변환하는 헬퍼 메서드
     private String sanitizeString(String input) {
         return (input != null && !input.trim().isEmpty()) ? input : null;
+    }
+
+    // 비밀번호 검증 메소드
+    private void validatePassword(String inputPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(inputPassword, encodedPassword)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+        }
     }
 
 }

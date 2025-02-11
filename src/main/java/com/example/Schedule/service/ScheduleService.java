@@ -1,5 +1,6 @@
 package com.example.Schedule.service;
 
+import com.example.Schedule.config.PasswordEncoder;
 import com.example.Schedule.dto.ScheduleRequestDto;
 import com.example.Schedule.dto.ScheduleResponseDto;
 import com.example.Schedule.entity.Schedule;
@@ -18,10 +19,12 @@ import java.util.List;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // create -> 일정 생성
     public ScheduleResponseDto createSchedule(User currentUser, String password, String title, String contents) {
-        Schedule schedule = new Schedule(currentUser, password, title, contents);
+        String encodedPassword = passwordEncoder.encode(password);
+        Schedule schedule = new Schedule(currentUser, encodedPassword, title, contents);
         Schedule savedSchedule = scheduleRepository.save(schedule);
         return new ScheduleResponseDto(savedSchedule.getId(),
                 savedSchedule.getUser().getUsername(),
@@ -56,7 +59,7 @@ public class ScheduleService {
         verifyScheduleOwnership(findSchedule,currentUserId);
 
         if(sanitizeString(requestDto.getPassword()) != null){
-            findSchedule.setPassword(requestDto.getPassword());
+            findSchedule.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         }
 
         if(sanitizeString(requestDto.getTitle()) != null){
@@ -90,7 +93,7 @@ public class ScheduleService {
     // 비밀번호 검증 메소드
     private void verifyPassword(Schedule schedule, String inputPassword) {
         // 비밀번호 검증
-        if (!schedule.getPassword().equals(inputPassword)) {
+        if (!passwordEncoder.matches(inputPassword,schedule.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
         }
     }
@@ -101,6 +104,4 @@ public class ScheduleService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
         }
     }
-
-
 }
