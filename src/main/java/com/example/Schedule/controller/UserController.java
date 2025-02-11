@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class UserController {
     // Create -> 사용자 정보 생성
     @PostMapping("/signup")
     @Operation(summary = "사용자 생성", description = "사용자를 생성합니다.")
-    public ResponseEntity<UserResponseDto> signUp(@RequestBody UserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> signUp(@Valid @RequestBody UserRequestDto requestDto) {
         UserResponseDto signUpResponseDto = userService.signUp(
                 requestDto.getUsername(),
                 requestDto.getPassword(),
@@ -101,10 +102,10 @@ public class UserController {
     }
 
     // 관리자 권한 검증 메소드
-    private void checkAdminRole(HttpServletRequest request){
+    private void checkAdminRole(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if(session == null || !"ADMIN".equals(session.getAttribute("role"))){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"접근 권한이 없습니다.");
+        if (session == null || !"ADMIN".equals(session.getAttribute("role"))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.");
         }
     }
 

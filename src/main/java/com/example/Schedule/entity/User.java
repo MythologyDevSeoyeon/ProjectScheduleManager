@@ -1,6 +1,10 @@
 package com.example.Schedule.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Filter;
@@ -21,12 +25,19 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "이름은 필수 입력 값입니다.")
+    @Size(max = 5, message = "이름은 최대 5글자까지 입력할 수 있습니다.")
     @Column(nullable = false)
     private String username;
 
+    @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{6,12}$",
+            message = "비밀번호는 6~12자의 영문자와 숫자 조합이어야 합니다.")
     @Column(nullable = false)
     private String password;
 
+    @Email
+    @NotBlank(message = "이메일은 필수 입력 값입니다.")
     @Column(nullable = false, unique = true)
     private String email;
 
