@@ -29,7 +29,10 @@ public class ScheduleService {
         return new ScheduleResponseDto(savedSchedule.getId(),
                 savedSchedule.getUser().getUsername(),
                 savedSchedule.getTitle(),
-                savedSchedule.getContents());
+                savedSchedule.getContents(),
+                savedSchedule.getCreatedAt(),
+                savedSchedule.getUpdatedAt()
+        );
     }
 
     // Read -> 일정 조회
