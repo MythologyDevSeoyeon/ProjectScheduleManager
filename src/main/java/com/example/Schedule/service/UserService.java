@@ -3,7 +3,9 @@ package com.example.Schedule.service;
 import com.example.Schedule.dto.UserResponseDto;
 import com.example.Schedule.entity.User;
 import com.example.Schedule.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final EntityManager entityManager;
 
     // Create -> 사용자 정보 생성
     public UserResponseDto signUp(String username, String password, String email) {
@@ -28,7 +31,6 @@ public class UserService {
         } catch (ResponseStatusException e) {
             // 이메일이 없으면 정상적으로 회원가입 진행
         }
-
         User user = new User(username, password, email);
         User savedUser = userRepository.save(user);
         return new UserResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail());
@@ -36,16 +38,22 @@ public class UserService {
 
     // Read
     // 아이디, 이름, 이메일로 조회
+    @Transactional
     public List<UserResponseDto> findUsers(Long id, String username, String email) {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("deletedFilter").setParameter("isDeleted", false);
+
         List<User> userList = userRepository.findUsers(id,
                 sanitizeString(username),
                 sanitizeString(email)
         );
+
         if (userList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return userList.stream().map(UserResponseDto::toDto).toList();
     }
+
 
     //update
     // 비밀번호 일치 시, 비밀번호, 사용자 이름, 이메일 수정 가능

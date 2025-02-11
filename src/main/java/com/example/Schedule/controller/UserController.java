@@ -78,6 +78,7 @@ public class UserController {
         }
         Long currentUserId = (Long) session.getAttribute("userId");
         userService.softDeleteUser(currentUserId, password);
+        session.invalidate(); // 로그아웃 처리
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
