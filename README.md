@@ -58,6 +58,17 @@ Swagger UI를 통해 API를 쉽게 확인하고 테스트할 수 있습니다.
   - 로그인한 사용자가 비밀번호를 입력하여, 사용자가 작성한 특정 일정을 삭제합니다.
 <br>
 
+### ✅ 댓글 관리 (CRUD)
+- **댓글 추가** (`POST /schedules/{scheduleId}/comments`)  
+  - 로그인한 사용자가 일정에 댓글을 등록합니다.
+- **댓글 조회** (`GET /schedules/comments`)  
+  - 특정 일정의 댓글을 조회합니다.
+- **댓글 수정 (전체 및 부분 수정)** (`PATCH /schedules/{scheduleId}/comments/{commentId}`)  
+  - 로그인한 사용자가 스케줄 아이디와, 댓글 아이디를 조회하여, 댓글을 수정합니다.
+- **댓글 삭제** (`DELETE /schedules/{scheduleId}/comments/{commentId}`)  
+  - 로그인한 사용자가 스케줄 아이디와, 댓글 아이디를 조회하여, 댓글을 삭제합니다.
+<br>
+
 ### ✅ Swagger를 통한 API 문서 확인
 Swagger를 통해 API를 쉽게 테스트할 수 있습니다.
 <br> 
@@ -107,17 +118,29 @@ http://localhost:8080/v3/api-docs
 +---------------+---------------------------+-----------------------------------------------------+
 | HTTP Method   | URL                       | 설명                                                 |
 +---------------+---------------------------+-----------------------------------------------------+
-| `POST`        | `/schedules`             | 로그인한 사용자가 새로운 일정을 등록합니다                      |
-| `GET`         | `/schedules`             | 로그인한 사용자가 모든 일정을 조회합니다                       |
+| `POST`        | `/schedules`              | 로그인한 사용자가 새로운 일정을 등록합니다                     |
+| `GET`         | `/schedules`              | 로그인한 사용자가 모든 일정을 조회합니다                      |
 |               |                           | (사용자 및 제목으로 필터링 가능)                           |
-| `PATCH`       | `/schedules/{id}`        | 로그인한 사용자가 비밀번호를 입력하여 일정을 수정합니다            |
-| `DELETE`      | `/schedules/{id}`        | 로그인한 사용자가 비밀번호를 입력하여 일정을 삭제합니다            |
+| `PATCH`       | `/schedules/{id}`         | 로그인한 사용자가 비밀번호를 입력하여 일정을 수정합니다           |
+| `DELETE`      | `/schedules/{id}`         | 로그인한 사용자가 비밀번호를 입력하여 일정을 삭제합니다           |
 +---------------+---------------------------+-----------------------------------------------------+
+```
+
+### 📅 일정 관리 (CRUD)
+```plaintext
++---------------+--------------------------------------------------+------------------------------------------------------------+
+| HTTP Method   | URL                                              | 설명                                                        |
++---------------+--------------------------------------------------+------------------------------------------------------------+
+| `POST`        | `/schedules/{scheduleId}/comments`               | 로그인한 사용자가 일정에 댓글을 등록합니다                           |
+| `GET`         | `/schedules/comments`                            | 특정 일정의 댓글을 조회합니다                                     |
+| `PATCH`       | `/schedules/{scheduleId}/comments/{commentId}`   | 로그인한 사용자가 스케줄 아이디와 댓글 아이디를 조회하여 댓글을 수정합니다   |
+| `DELETE`      | `/schedules/{scheduleId}/comments/{commentId}`   | 로그인한 사용자가 스케줄 아이디와 댓글 아이디를 조회하여 댓글을 삭제합니다   |
++---------------+--------------------------------------------------+------------------------------------------------------------+
 ```
 <br><br><br>
 
 ## 📑ERD
-<img width="587" alt="Image" src="https://github.com/user-attachments/assets/7230d5ea-791e-47ff-80f6-de2496b986fd" />
+<img width="831" alt="Image" src="https://github.com/user-attachments/assets/439822ab-d817-4bdc-9ecd-a8f4749fb9f1" />
 <br><br><br>
 
 ## 📂파일 구조
@@ -130,9 +153,12 @@ http://localhost:8080/v3/api-docs
 │   │     ├── SwaggerConfig.java       # Swagger 설정
 │   ├── controller
 │   │     ├── AuthController.java      # 로그인/로그아웃 API 컨트롤러
+│   │     ├── CommentController.java   # 댓글 API 컨트롤러
 │   │     ├── ScheduleController.java  # 일정 API 컨트롤러
 │   │     ├── UserController.java      # 사용자 API 컨트롤러
 │   ├── dto
+│   │     ├── comment
+│   │     │     ├── CommentResponseDto.java  # 댓글 응답 DTO
 │   │     ├── login
 │   │     │     ├── LoginRequestDto.java     # 로그인 요청 DTO
 │   │     ├── schedule
@@ -143,15 +169,18 @@ http://localhost:8080/v3/api-docs
 │   │     │     ├── UserResponseDto.java     # 사용자 응답 DTO
 │   ├── entity
 │   │     ├── BaseEntity.java          # 기본 엔티티 (생성날짜, 수정날짜)
+│   │     ├── CommentEntity.java       # 댓글 엔티티 
 │   │     ├── Role.java                # 권한 설정 이넘
 │   │     ├── Schedule.java            # 일정 엔티티
 │   │     ├── User.java                # 사용자 엔티티
 │   ├── filter
 │   │     ├── AuthFilter.java          # 로그인 필터
 │   ├── repository
+│   │     ├── CommentRepository.java   # 댓글 데이터베이스 인터페이스
 │   │     ├── ScheduleRepository.java  # 일정 데이터베이스 인터페이스
-│   │     ├── UserRepository.java  # 사용자 데이터베이스 인터페이스
+│   │     ├── UserRepository.java      # 사용자 데이터베이스 인터페이스
 │   ├── service
+│   │     ├── CommentService.java      # 댓글 서비스
 │   │     ├── LoginService.java        # 로그인 서비스
 │   │     ├── ScheduleService.java     # 일정 서비스
 │   │     ├── UserService.java         # 사용자 서비스
