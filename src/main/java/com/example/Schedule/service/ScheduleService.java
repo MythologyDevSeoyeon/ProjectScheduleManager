@@ -44,7 +44,7 @@ public class ScheduleService {
                 userId,
                 sanitizeString(username)
         );
-        if(scheduleList.isEmpty()){
+        if (scheduleList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return scheduleList.stream().map(ScheduleResponseDto::toDto).toList();
@@ -58,22 +58,23 @@ public class ScheduleService {
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
 
         // 검증
-        verifyPassword(findSchedule,inputPassword);
-        verifyScheduleOwnership(findSchedule,currentUserId);
+        verifyPassword(findSchedule, inputPassword);
+        verifyScheduleOwnership(findSchedule, currentUserId);
 
-        if(sanitizeString(requestDto.getPassword()) != null){
+        if (sanitizeString(requestDto.getPassword()) != null) {
             findSchedule.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         }
 
-        if(sanitizeString(requestDto.getTitle()) != null){
+        if (sanitizeString(requestDto.getTitle()) != null) {
             findSchedule.setTitle(requestDto.getTitle());
         }
 
-        if(sanitizeString(requestDto.getContents()) != null){
+        if (sanitizeString(requestDto.getContents()) != null) {
             findSchedule.setContents(requestDto.getContents());
         }
 
-        return ScheduleResponseDto.toDto(findSchedule);
+        Schedule updatedSchedule = scheduleRepository.save(findSchedule);
+        return ScheduleResponseDto.toDto(updatedSchedule);
     }
 
     // delete -> 일정 삭제
@@ -82,8 +83,8 @@ public class ScheduleService {
 
         Schedule findSchedule = scheduleRepository.findByIdOrElseThrow(id);
 
-        verifyPassword(findSchedule,inputPassword);
-        verifyScheduleOwnership(findSchedule,currentUserId);
+        verifyPassword(findSchedule, inputPassword);
+        verifyScheduleOwnership(findSchedule, currentUserId);
 
         scheduleRepository.deleteById(id);
     }
@@ -96,14 +97,14 @@ public class ScheduleService {
     // 비밀번호 검증 메소드
     private void verifyPassword(Schedule schedule, String inputPassword) {
         // 비밀번호 검증
-        if (!passwordEncoder.matches(inputPassword,schedule.getPassword())) {
+        if (!passwordEncoder.matches(inputPassword, schedule.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
         }
     }
 
     // 권한 검증 메소드
-    private void verifyScheduleOwnership(Schedule schedule, Long currentUserId){
-        if(!schedule.getUser().getId().equals(currentUserId)){
+    private void verifyScheduleOwnership(Schedule schedule, Long currentUserId) {
+        if (!schedule.getUser().getId().equals(currentUserId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
         }
     }

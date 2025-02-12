@@ -15,7 +15,7 @@ public class Schedule extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     @NotBlank(message = "제목은 필수 입력 값입니다.")
     @Size(max = 10, message = "제목은 최대 10글자까지 입력할 수 있습니다.")
     private String title;

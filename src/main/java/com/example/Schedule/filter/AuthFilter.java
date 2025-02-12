@@ -1,4 +1,4 @@
-package com.example.Schedule.Filter;
+package com.example.Schedule.filter;
 
 
 import jakarta.servlet.*;
