@@ -28,16 +28,16 @@ public class ScheduleResponseDto {
 
     // entity를 dto로 변환
     public static ScheduleResponseDto toDto(Schedule schedule) {
-        return new ScheduleResponseDto(schedule.getId(), schedule.getUser().getUsername(), schedule.getTitle(), schedule.getContents(),schedule.getCreatedAt(),schedule.getUpdatedAt());
+        return new ScheduleResponseDto(schedule.getId(), schedule.getUser().getUsername(), schedule.getTitle(), schedule.getContents(), schedule.getCreatedAt(), schedule.getUpdatedAt());
     }
 
     // 날짜 형식 변환
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    public static String formatDate(LocalDateTime datetime){
+
+    public static String formatDate(LocalDateTime datetime) {
         return Optional.ofNullable(datetime)
                 .map(FORMATTER::format)
                 .orElse(null);
     }
-
 
 }

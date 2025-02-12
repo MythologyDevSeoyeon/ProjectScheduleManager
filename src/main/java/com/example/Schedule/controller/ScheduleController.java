@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/schedules")
 @RequiredArgsConstructor
-@Tag(name = "일정 관리 API", description = "일정을 생성하고 조회하는 API입니다.")
+@Tag(name = "일정 관리 API", description = "일정을 관리하는 API입니다.")
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
@@ -59,7 +59,7 @@ public class ScheduleController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "일정 수정", description = "로그인한 사용자의 이름. 비밀번호, 이메일을 수정합니다.")
+    @Operation(summary = "일정 수정", description = "로그인한 사용자의 이름, 비밀번호, 이메일을 수정합니다.")
     public ResponseEntity<ScheduleResponseDto> updatedSchedule(
             @PathVariable Long id,
             @RequestParam String inputPassword,
@@ -82,9 +82,9 @@ public class ScheduleController {
             @PathVariable Long id,
             @RequestParam String password,
             HttpServletRequest request
-    ){
+    ) {
         HttpSession session = request.getSession(false);
-        if(session == null || session.getAttribute("userId") == null){
+        if (session == null || session.getAttribute("userId") == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         Long currentUserID = (Long) session.getAttribute("userId");

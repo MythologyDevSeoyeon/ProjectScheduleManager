@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Repository
-public interface ScheduleRepository extends JpaRepository <Schedule, Long> {
+public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     // 일정 조회
     @Query("SELECT s FROM Schedule s " +
@@ -28,7 +28,7 @@ public interface ScheduleRepository extends JpaRepository <Schedule, Long> {
     );
 
     // 아이디로 일정 조회
-    default Schedule findByIdOrElseThrow(Long id){
+    default Schedule findByIdOrElseThrow(Long id) {
         return findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id));
     }
 }

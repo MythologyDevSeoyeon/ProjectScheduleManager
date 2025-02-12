@@ -26,15 +26,15 @@ public class AuthController {
             @RequestBody LoginRequestDto requestDto,
             HttpServletRequest request
     ) {
-        loginService.login(requestDto.getEmail(),requestDto.getPassword(), request);
+        loginService.login(requestDto.getEmail(), requestDto.getPassword(), request);
         return ResponseEntity.ok("Login successful");
     }
 
     @PostMapping("/logout")
     @Operation(summary = "로그아웃", description = "로그아웃 합니다.")
-    public ResponseEntity<String> logout(HttpServletRequest request){
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if(session != null){
+        if (session != null) {
             session.invalidate();
         }
         return ResponseEntity.ok("Logout successful");

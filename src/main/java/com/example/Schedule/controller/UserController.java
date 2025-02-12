@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@Tag(name = "사용자 관리 API", description = "사용자를 생성하고 조회하는 API입니다.")
+@Tag(name = "사용자 관리 API", description = "사용자를 관리하는 API입니다.")
 public class UserController {
 
     private final UserService userService;
