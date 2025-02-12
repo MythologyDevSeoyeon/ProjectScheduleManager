@@ -117,4 +117,60 @@ http://localhost:8080/v3/api-docs
 <br><br><br>
 
 ## 📑ERD
+<img width="587" alt="Image" src="https://github.com/user-attachments/assets/88b52ffe-a35b-4b47-bad9-b4525d28965c"/>
+<br><br><br>
+
+## 📂파일 구조
+
+```
+├── src/main/java/com/example/Schedule
+│   ├── config
+│   │     ├── FilterConfig.java        # Filter 설정
+│   │     ├── PasswordEncorder.java    # 비밀번호 암호화 설정
+│   │     ├── SwaggerConfig.java       # Swagger 설정
+│   ├── controller
+│   │     ├── AuthController.java      # 로그인/로그아웃 API 컨트롤러
+│   │     ├── ScheduleController.java  # 일정 API 컨트롤러
+│   │     ├── UserController.java      # 사용자 API 컨트롤러
+│   ├── dto
+│   │     ├── login
+│   │     │     ├── LoginRequestDto.java     # 로그인 요청 DTO
+│   │     ├── schedule
+│   │     │     ├── ScheduleRequestDto.java  # 일정 요청 DTO
+│   │     │     ├── ScheduleResponseDto.java # 일정 응답 DTO
+│   │     ├── user
+│   │     │     ├── UserRequestDto.java      # 사용자 요청 DTO
+│   │     │     ├── UserResponseDto.java     # 사용자 응답 DTO
+│   ├── entity
+│   │     ├── BaseEntity.java          # 기본 엔티티 (생성날짜, 수정날짜)
+│   │     ├── Role.java                # 권한 설정 이넘
+│   │     ├── Schedule.java            # 일정 엔티티
+│   │     ├── User.java                # 사용자 엔티티
+│   ├── filter
+│   │     ├── AuthFilter.java          # 로그인 필터
+│   ├── repository
+│   │     ├── ScheduleRepository.java  # 일정 데이터베이스 인터페이스
+│   │     ├── UserRepository.java  # 사용자 데이터베이스 인터페이스
+│   ├── service
+│   │     ├── LoginService.java        # 로그인 서비스
+│   │     ├── ScheduleService.java     # 일정 서비스
+│   │     ├── UserService.java         # 사용자 서비스
+│   ├── ScheduleApplication.java       # 프로젝트 시작 파일
+```
+<br><br><br>
+
+## 📌사용된 기술
+<div align=center> 
+  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"> 
+  <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> 
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
+  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=white">
+  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
+  <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+</div>
+<br><br><br>
+
+## 📞Contact
+프로젝트 관련 문의는 [@Seoyeon](https://github.com/MythologyDevSeoyeon)으로 연락주세요
+<br><br><br>
 
