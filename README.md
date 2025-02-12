@@ -117,7 +117,7 @@ http://localhost:8080/v3/api-docs
 <br><br><br>
 
 ## 📑ERD
-<img width="587" alt="Image" src="https://github.com/user-attachments/assets/88b52ffe-a35b-4b47-bad9-b4525d28965c"/>
+<img width="587" alt="Image" src="https://github.com/user-attachments/assets/7230d5ea-791e-47ff-80f6-de2496b986fd" />
 <br><br><br>
 
 ## 📂파일 구조
